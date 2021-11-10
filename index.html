@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>VinLoyal go Cubing</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		
+
+<link rel="stylesheet" href="./main.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@300&display=swap" rel="stylesheet">
+	</head>
+	<body>
+
+		<div id="container"></div>
+
+			
+		</div>
+		<script id="vertexShader" type="x-shader/x-vertex">
+    varying vec3 vNormal;
+    varying vec3 vPositionNormal;
+    void main() 
+    {
+      vNormal = normalize( normalMatrix * normal ); // 转换到视图空间
+      vPositionNormal = normalize(( modelViewMatrix * vec4(position, 1.0) ).xyz);
+      gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+    }
+  </script>
+  <!-- fragment shader a.k.a. pixel shader -->
+  <script id="fragmentShader" type="x-shader/x-vertex"> 
+    uniform vec3 glowColor;
+    uniform float b;
+    uniform float h;
+    uniform float p;
+    uniform float s;
+    varying vec3 vNormal;
+    varying vec3 vPositionNormal;
+    void main() 
+    {
+      float a = pow( b + s * abs(dot(vNormal, vPositionNormal)), p );
+      gl_FragColor = vec4( glowColor, a );
+    }
+  </script>
+		<script type="module">
+
+			import * as THREE from './js/three.module.js';
+			import Stats from './js/stats.module.js';
+
+			import { GUI } from './js/dat.gui.module.js';
+			import { OrbitControls } from './js/OrbitControls.js';
+			import { Water } from './js/Water.js';
+			import { Sky } from './js/Sky.js';
+			import { GLTFLoader } from './js/GLTFLoader.js';
+
+			let container, stats, circle
+			let camera, scene, renderer;
+			let controls, water, sun, mesh, sky
+			var mixers = []
+			var clock = new THREE.Clock();
+			var mixer;
+			var clip1
+			var texts = []
+			var message
+			var deviceType 
+			init();
+			animate();
+			function createGlowMat(color,s,b,p){
+
+				 var glowMat =        new THREE.ShaderMaterial({
+				            uniforms: 
+				            { 
+				              "s":   { type: "f", value: s},
+
+				              "b":   { type: "f", value: b}, //outer border
+				              "p":   { type: "f", value: p },
+				              glowColor: { type: "a", value: new THREE.Color(color) }
+				            },
+				            vertexShader:   document.getElementById( 'vertexShader'   ).textContent,
+				            fragmentShader: document.getElementById( 'fragmentShader' ).textContent,
+				            side: THREE.FrontSide,
+				            blending: THREE.AdditiveBlending,
+				            transparent: true
+				            });
+				 return glowMat
+			}
+
+	var glowRedMat = createGlowMat("red",1,0,6.5)
+	var glowGoldMat = createGlowMat("gold",1,0,6.5)
+	var glowPurpleMat = createGlowMat(0xFF61F6,1,0,6.5)
+	var glowBlueMat = createGlowMat("0x0d0a22",0,8,8.5)
+	var glowGreenMat = createGlowMat("green",1,0,6.5)
+	var glowWhiteMat = createGlowMat("gold",0.85,0,6.5)
+	
+	var glowMysticMat = createGlowMat("violet",1,0,6.5)
+
+			function init() {
+
+				// detect device
+	
+			var deviceOrientation
+			if( /Android|webOS|iPhone|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+			  deviceType = "mobile"
+			}
+			else {deviceType = "PC"}
+
+			if(window.innerHeight > window.innerWidth){
+			    deviceOrientation = "portrait"
+			   
+			} else {
+			    deviceOrientation = "landscape"
+			}
+				//Countdown
+				container = document.getElementById( 'container' );
+				var info  = document.createElement("div");
+
+				container.appendChild(info)
+				info.setAttribute("id","info")
+
+
+				/*
+				var countDownDate = new Date("Mar 27, 2022 12:00:00").getTime()
+				var x = setInterval(function() {
+				
+				var now = new Date().getTime();
+
+			  // Find the distance between now an the count down date
+			  var distance = countDownDate - now;
+
+			  // Time calculations for days, hours, minutes and seconds
+			  var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+			  var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+			  var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+			  var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+			  // Display the result in the element with id="demo"
+			  info.innerHTML = " <span>"+ "Phase X incoming in next " + "</span>"+"</br>"+days + "d  " + hours + "h  "
+			  + minutes + "m  " + seconds + "s  ";
+
+			  // If the count down is finished, write some text 
+					  if (distance < 0) {
+					    clearInterval(x);
+					    //document.getElementById("demo").innerHTML = "EXPIRED";
+					  }
+				}, 1000);
+
+	*/
+			
+
+
+
+				//
+
+				renderer = new THREE.WebGLRenderer({
+				    antialias: true,
+    				alpha: true,
+    				powerPreference: "high-performance"	
+				});
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+
+				//renderer.physicallyCorrectLights = true;
+				container.appendChild( renderer.domElement );
+
+				//
+
+				scene = new THREE.Scene();
+
+				camera = new THREE.PerspectiveCamera( 55, window.innerWidth / window.innerHeight, 1, 20000 );
+				camera.position.set( 40, 40, 150 );
+
+				//
+
+				sun = new THREE.Vector3();
+
+				// Water
+
+				const waterGeometry = new THREE.PlaneGeometry( 10000, 10000 );
+
+				water = new Water(
+					waterGeometry,
+					{
+						textureWidth: 512,
+						textureHeight: 512,
+						waterNormals: new THREE.TextureLoader().load( './waternormals.jpg', function ( texture ) {
+
+							texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+
+						} ),
+						sunDirection: new THREE.Vector3(),
+						sunPosition: new THREE.Vector3(0,0,1000),
+						sunColor: 0xffffff,
+						waterColor: 0x001e0f,
+						distortionScale: 2.4,
+						fog: scene.fog !== undefined
+					}
+				);
+
+				water.rotation.x = - Math.PI / 2;
+				water.position.y = -20
+
+				scene.add( water );
+
+				// Skybox
+
+				sky = new Sky();
+				sky.scale.setScalar( 10000 );
+				scene.add( sky );
+
+
+
+				const skyUniforms = sky.material.uniforms;
+
+				skyUniforms[ 'turbidity' ].value = 1;
+				skyUniforms[ 'rayleigh' ].value = 0.5;
+				skyUniforms[ 'mieCoefficient' ].value = 0.005;
+				skyUniforms[ 'mieDirectionalG' ].value = 0.8;
+
+
+				const parameters = {
+					elevation: 8,
+					azimuth: 160.5
+				};
+
+				const pmremGenerator = new THREE.PMREMGenerator( renderer );
+
+				function updateSun() {
+
+					const phi = THREE.MathUtils.degToRad( 90 - parameters.elevation );
+					const theta = THREE.MathUtils.degToRad( parameters.azimuth );
+
+					sun.setFromSphericalCoords( 1, phi, theta );
+
+					sky.material.uniforms[ 'sunPosition' ].value.copy( sun );
+					water.material.uniforms[ 'sunDirection' ].value.copy( sun ).normalize();
+
+					scene.environment = pmremGenerator.fromScene( sky ).texture;
+
+				}
+
+				updateSun();
+
+				//
+				
+				const geometry = new THREE.BoxGeometry( 30, 30, 30 );
+				//const material = new THREE.MeshStandardMaterial( { roughness: 0 } );
+
+				const texture = new THREE.TextureLoader().load( './logo.png' );
+
+			// immediately use the texture for material creation
+				const material = new THREE.MeshStandardMaterial( { map: texture, roughness:0 } );
+
+
+
+				mesh = new THREE.Mesh( geometry, material );
+				mesh.position.x = -60
+				scene.add( mesh );
+				mesh.receiveShadow = true;
+
+				//scene.add( mesh );
+
+
+
+			//helper
+			const axesHelper = new THREE.AxesHelper( 5 );
+//scene.add( axesHelper );
+
+			// TEXT
+			var textLoader = new THREE.FontLoader()
+				
+            textLoader.load("./Domotika Trial_Regular.json", function (font) {
+		
+			
+            	if(deviceType === "PC"){
+             var geometry = new THREE.TextGeometry("VinLoyal", {
+                  font: font,
+                  size: 20.5,
+                  height: 0.1,
+                  curveSegments: 40,
+                  bevelEnabled: true,
+                  bevelThickness: 4,
+                  bevelSize: 0.88,
+                  bevelSegments: 15
+              });} else {
+              var geometry = new THREE.TextGeometry("VinLoyal", {
+                  font: font,
+                  size: 10.5,
+                  height: 0.1,
+                  curveSegments: 40,
+                  bevelEnabled: true,
+                  bevelThickness: 4,
+                  bevelSize: 0.18,
+                  bevelSegments: 15
+              });            	
+             }
+
+
+
+              geometry.center();
+              var blueMat = new THREE.MeshStandardMaterial({color: 0x1A1444, emissive: 0x1A1444,emissiveIntensity: 0.1, roughness:0.5})
+
+            let text = new THREE.Mesh(geometry, blueMat)
+              text.position.set(20,-8,5)
+             scene.add(text)
+             texts.push(text)
+
+             const light = new THREE.PointLight( 0x133BBB, 5, 100 );
+				light.position.set( 15, 25, 45 );
+text.add( light );
+
+         })
+
+        
+				//
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.maxPolarAngle = Math.PI * 0.495;
+				controls.target.set( 0, 10, 0 );
+				controls.minDistance = 40.0;
+				controls.maxDistance = 200.0;
+
+				controls.autoRotate = true;
+				controls.autoRotateSpeed = 0.5
+
+				controls.update();
+
+				//raycast
+
+
+				//end
+
+				stats = new Stats();
+				//container.appendChild( stats.dom );
+
+				// GUI
+
+/*
+				const gui = new GUI();
+				
+				const folderSky = gui.addFolder( 'Sky' );
+				folderSky.add( parameters, 'elevation', 0, 90, 0.1 ).onChange( updateSun );
+				folderSky.add( parameters, 'azimuth', - 180, 180, 0.1 ).onChange( updateSun );
+				folderSky.open();
+
+				const waterUniforms = water.material.uniforms;
+
+				const folderWater = gui.addFolder( 'Water' );
+				folderWater.add( waterUniforms.distortionScale, 'value', 0, 8, 0.1 ).name( 'distortionScale' );
+				folderWater.add( waterUniforms.size, 'value', 0.1, 10, 0.1 ).name( 'size' );
+				folderWater.open();
+	*/
+				//
+
+				window.addEventListener( 'resize', onWindowResize );//
+
+				//text countdown
+
+
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+				
+				controls.update();
+				//if ( mixer) mixer.update( clock.getDelta() );
+				requestAnimationFrame( animate );
+
+				stats.update();
+				let delta = clock.getDelta();
+				
+    			render();
+
+
+			}
+
+			function render() {
+
+				const time = performance.now() * 0.0008;
+				//console.log(time)
+
+
+				mesh.position.y = Math.sin( time ) * 15;
+				mesh.rotation.x = time * 0.5;
+				mesh.rotation.z = time * 0.51;
+				
+			//	for (let i = 0; i < texts.length;i++){
+			//	texts[i].rotation.y = - 0.04* time}
+
+
+				water.material.uniforms[ 'time' ].value += 1.0 / 60.0;
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+
+
+<!-- partial -->
+
+	</body>
+</html>

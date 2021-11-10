@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Project TPN - retracted</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		
+
+<link rel="stylesheet" href="./main.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@300&display=swap" rel="stylesheet">
+	</head>
+	<body>
+		    <div id="preloader">
+  <div id="status">&nbsp;</div>
+</div>
+		<div id="container"></div>
+
+			
+		</div>
+		<script id="vertexShader" type="x-shader/x-vertex">
+    varying vec3 vNormal;
+    varying vec3 vPositionNormal;
+    void main() 
+    {
+      vNormal = normalize( normalMatrix * normal ); // 转换到视图空间
+      vPositionNormal = normalize(( modelViewMatrix * vec4(position, 1.0) ).xyz);
+      gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+    }
+  </script>
+  <!-- fragment shader a.k.a. pixel shader -->
+  <script id="fragmentShader" type="x-shader/x-vertex"> 
+    uniform vec3 glowColor;
+    uniform float b;
+    uniform float h;
+    uniform float p;
+    uniform float s;
+    varying vec3 vNormal;
+    varying vec3 vPositionNormal;
+    void main() 
+    {
+      float a = pow( b + s * abs(dot(vNormal, vPositionNormal)), p );
+      gl_FragColor = vec4( glowColor, a );
+    }
+  </script>
+		<script type="module">
+
+			var _0x3c51=['rotation','updateProjectionMatrix','normalize','setAttribute','59005LwIDiy','mobile','appendChild','degToRad','3zhbLSr','MathUtils','toneMapping','111031coyjdV','play','./zen2.glb','2pENTrr','push','setPixelRatio','innerHTML','</br>','\x20<span>','update','textContent','scale','texture','scene','set','FrontSide','461NnuUUm','environment','WebGLRenderer','</span>','getElementById','time','fromScene','container','The\x20Promised\x20Neverland','resize','wrapS','FontLoader','test','render','fragmentShader','getDelta','blue','Mesh','sunDirection','wrapT','setSize','Scene','rayleigh','clipAction','autoRotateSpeed','RepeatWrapping','Eye_ball_out_dragon_eye_ball_out_0','562TEEgiA','fog','value','uniforms','761hnpNAc','high-performance','PerspectiveCamera','maxPolarAngle','BoxGeometry','setScalar','devicePixelRatio','AnimationMixer','41707wimmXj','vertexShader','TextGeometry','d\x20\x20','Aug\x2027,\x202021\x2012:00:00','PMREMGenerator','innerHeight','s\x20\x20','getObjectByName','sunPosition','add','timeScale','Color','24nadQIh','sin','225401GfZQxO','TextureLoader','PlaneGeometry','floor','demo','animations','azimuth','copy','./waternormals.jpg','red','Eyecore_b_dragon_eye_core_0','AdditiveBlending','green','Clock','Vector3','now','907EaHbdz','material','innerWidth','domElement','position','Eye_ball_inner_dragon_eye_ball_inner_0','Eyecore_a_dragon_eye_core_0','getTime','Eneergy_Ball_energy_ball_0','EXPIRED','MeshStandardMaterial','info','127PFvipL'];var _0x17e615=_0x23d9;(function(_0x207bec,_0x31a4e7){var _0x57703b=_0x23d9;while(!![]){try{var _0x50c839=parseInt(_0x57703b(0x1d6))+parseInt(_0x57703b(0x1e3))*-parseInt(_0x57703b(0x1f5))+-parseInt(_0x57703b(0x1ce))*-parseInt(_0x57703b(0x201))+-parseInt(_0x57703b(0x1e5))+-parseInt(_0x57703b(0x210))*-parseInt(_0x57703b(0x20d))+-parseInt(_0x57703b(0x1af))*-parseInt(_0x57703b(0x1ca))+-parseInt(_0x57703b(0x20a))*parseInt(_0x57703b(0x206));if(_0x50c839===_0x31a4e7)break;else _0x207bec['push'](_0x207bec['shift']());}catch(_0x41743c){_0x207bec['push'](_0x207bec['shift']());}}}(_0x3c51,0x2faf2));import*as _0x5fdc25 from'./js/three.module.js';import _0x4b8d80 from'./js/stats.module.js';import{GUI}from'./js/dat.gui.module.js';import{OrbitControls}from'./js/OrbitControls.js';import{Water}from'./js/Water.js';function _0x23d9(_0x251311,_0x1a96f2){return _0x23d9=function(_0x3c51eb,_0x23d9fd){_0x3c51eb=_0x3c51eb-0x1ac;var _0x5bbd7d=_0x3c51[_0x3c51eb];return _0x5bbd7d;},_0x23d9(_0x251311,_0x1a96f2);}import{Sky}from'./js/Sky.js';import{GLTFLoader}from'./js/GLTFLoader.js';let container,stats,circle,camera,scene,renderer,controls,water,sun,mesh,sky;var mixers=[],clock=new _0x5fdc25[(_0x17e615(0x1f2))](),mixer,clip1,texts=[],message,deviceType;init(),animate();function createGlowMat(_0x678f1d,_0x575e7a,_0x187f62,_0x58db5e){var _0x16f349=_0x17e615,_0x1fc246=new _0x5fdc25['ShaderMaterial']({'uniforms':{'s':{'type':'f','value':_0x575e7a},'b':{'type':'f','value':_0x187f62},'p':{'type':'f','value':_0x58db5e},'glowColor':{'type':'c','value':new _0x5fdc25[(_0x16f349(0x1e2))](_0x678f1d)}},'vertexShader':document[_0x16f349(0x1b3)](_0x16f349(0x1d7))[_0x16f349(0x217)],'fragmentShader':document['getElementById'](_0x16f349(0x1bd))['textContent'],'side':_0x5fdc25[_0x16f349(0x1ae)],'blending':_0x5fdc25[_0x16f349(0x1f0)],'transparent':!![]});return _0x1fc246;}var glowRedMat=createGlowMat(_0x17e615(0x1ee),0x1,0x0,6.5),glowGoldMat=createGlowMat('gold',0x1,0x0,6.5),glowPurpleMat=createGlowMat(0xff61f6,0x1,0x0,6.5),glowBlueMat=createGlowMat(_0x17e615(0x1bf),0x1,0x0,8.5),glowGreenMat=createGlowMat(_0x17e615(0x1f1),0x1,0x0,6.5),glowWhiteMat=createGlowMat('gold',0.85,0x0,6.5),glowMysticMat=createGlowMat('violet',0x1,0x0,6.5);function init(){var _0x47ace5=_0x17e615,_0x143214;/Android|webOS|iPhone|iPod|BlackBerry|IEMobile|Opera Mini/i[_0x47ace5(0x1bb)](navigator['userAgent'])?deviceType=_0x47ace5(0x207):deviceType='PC';window[_0x47ace5(0x1dc)]>window[_0x47ace5(0x1f7)]?_0x143214='portrait':_0x143214='landscape';container=document[_0x47ace5(0x1b3)](_0x47ace5(0x1b6));var _0x235e63=document['createElement']('div');container[_0x47ace5(0x208)](_0x235e63),_0x235e63[_0x47ace5(0x205)]('id',_0x47ace5(0x200));var _0x533fa9=new Date(_0x47ace5(0x1da))[_0x47ace5(0x1fc)](),_0x5bdd98=setInterval(function(){var _0xc14e38=_0x47ace5,_0x2b279d=new Date()[_0xc14e38(0x1fc)](),_0x12248b=_0x533fa9-_0x2b279d,_0x1b73b1=Math['floor'](_0x12248b/(0x3e8*0x3c*0x3c*0x18)),_0x4e561d=Math['floor'](_0x12248b%(0x3e8*0x3c*0x3c*0x18)/(0x3e8*0x3c*0x3c)),_0x56149d=Math[_0xc14e38(0x1e8)](_0x12248b%(0x3e8*0x3c*0x3c)/(0x3e8*0x3c)),_0x2144d3=Math['floor'](_0x12248b%(0x3e8*0x3c)/0x3e8);_0x235e63[_0xc14e38(0x213)]=_0xc14e38(0x215)+'Season\x202\x20incoming\x20in\x20next\x20'+_0xc14e38(0x1b2)+_0xc14e38(0x214)+_0x1b73b1+_0xc14e38(0x1d9)+_0x4e561d+'h\x20\x20'+_0x56149d+'m\x20\x20'+_0x2144d3+_0xc14e38(0x1dd),_0x12248b<0x0&&(clearInterval(_0x5bdd98),document[_0xc14e38(0x1b3)](_0xc14e38(0x1e9))['innerHTML']=_0xc14e38(0x1fe));},0x3e8);renderer=new _0x5fdc25[(_0x47ace5(0x1b1))]({'antialias':!![],'alpha':!![],'powerPreference':_0x47ace5(0x1cf)}),renderer[_0x47ace5(0x212)](window[_0x47ace5(0x1d4)]),renderer[_0x47ace5(0x1c3)](window['innerWidth'],window['innerHeight']),renderer[_0x47ace5(0x20c)]=_0x5fdc25['ACESFilmicToneMapping'],container['appendChild'](renderer[_0x47ace5(0x1f8)]),scene=new _0x5fdc25[(_0x47ace5(0x1c4))](),camera=new _0x5fdc25[(_0x47ace5(0x1d0))](0x37,window[_0x47ace5(0x1f7)]/window[_0x47ace5(0x1dc)],0x1,0x4e20),camera[_0x47ace5(0x1f9)][_0x47ace5(0x1ad)](0x0,0x1e,0x96),sun=new _0x5fdc25[(_0x47ace5(0x1f3))]();const _0x12ae0c=new _0x5fdc25[(_0x47ace5(0x1e7))](0x2710,0x2710);water=new Water(_0x12ae0c,{'textureWidth':0x200,'textureHeight':0x200,'waterNormals':new _0x5fdc25[(_0x47ace5(0x1e6))]()['load'](_0x47ace5(0x1ed),function(_0x56d3d5){var _0x2bc07f=_0x47ace5;_0x56d3d5[_0x2bc07f(0x1b9)]=_0x56d3d5[_0x2bc07f(0x1c2)]=_0x5fdc25[_0x2bc07f(0x1c8)];}),'sunDirection':new _0x5fdc25[(_0x47ace5(0x1f3))](),'sunColor':0xffffff,'waterColor':0x1e0f,'distortionScale':3.4,'fog':scene[_0x47ace5(0x1cb)]!==undefined}),water[_0x47ace5(0x202)]['x']=-Math['PI']/0x2,water[_0x47ace5(0x1f9)]['y']=-0x14,scene[_0x47ace5(0x1e0)](water),sky=new Sky(),sky['scale'][_0x47ace5(0x1d3)](0x2710),scene['add'](sky);const _0x525718=sky[_0x47ace5(0x1f6)][_0x47ace5(0x1cd)];_0x525718['turbidity'][_0x47ace5(0x1cc)]=0xa,_0x525718[_0x47ace5(0x1c5)][_0x47ace5(0x1cc)]=0x2,_0x525718['mieCoefficient'][_0x47ace5(0x1cc)]=0.005,_0x525718['mieDirectionalG'][_0x47ace5(0x1cc)]=0.8;const _0x2e48de={'elevation':0x2,'azimuth':60.5},_0x5cd950=new _0x5fdc25[(_0x47ace5(0x1db))](renderer);function _0x13cb14(){var _0x334395=_0x47ace5;const _0x3a2cf7=_0x5fdc25[_0x334395(0x20b)][_0x334395(0x209)](0x5a-_0x2e48de['elevation']),_0x23a576=_0x5fdc25[_0x334395(0x20b)]['degToRad'](_0x2e48de[_0x334395(0x1eb)]);sun['setFromSphericalCoords'](0x1,_0x3a2cf7,_0x23a576),sky['material'][_0x334395(0x1cd)][_0x334395(0x1df)][_0x334395(0x1cc)][_0x334395(0x1ec)](sun),water[_0x334395(0x1f6)][_0x334395(0x1cd)][_0x334395(0x1c1)][_0x334395(0x1cc)]['copy'](sun)[_0x334395(0x204)](),scene[_0x334395(0x1b0)]=_0x5cd950[_0x334395(0x1b5)](sky)[_0x334395(0x219)];}_0x13cb14();var _0x42e2f6=[];const _0x10e5e5=new _0x5fdc25[(_0x47ace5(0x1d2))](0x1e,0x1e,0x1e),_0x640936=new _0x5fdc25[(_0x47ace5(0x1ff))]({'roughness':0x0});mesh=new _0x5fdc25[(_0x47ace5(0x1c0))](_0x10e5e5,_0x640936);var _0x25fb52=new GLTFLoader();_0x25fb52['load'](_0x47ace5(0x20f),function(_0x15dd19){var _0x354d09=_0x47ace5;mesh=_0x15dd19[_0x354d09(0x1ac)];if(deviceType==='PC'){mesh[_0x354d09(0x1f9)][_0x354d09(0x1ad)](0x0,0x0,0x0);var _0x443cd0=15.5;mesh[_0x354d09(0x218)][_0x354d09(0x1ad)](_0x443cd0,_0x443cd0,_0x443cd0);}else{mesh[_0x354d09(0x1f9)][_0x354d09(0x1ad)](0x0,0x0,0x0);var _0x443cd0=10.5;mesh['scale'][_0x354d09(0x1ad)](_0x443cd0,_0x443cd0,_0x443cd0);}var _0x37886f=mesh['getObjectByName'](_0x354d09(0x1fd));_0x37886f[_0x354d09(0x218)][_0x354d09(0x1ad)](0x4,0x4,0x4),_0x37886f[_0x354d09(0x1f6)]=glowPurpleMat;var _0x31fd7c=mesh['getObjectByName'](_0x354d09(0x1fb));_0x31fd7c[_0x354d09(0x1f6)]=glowPurpleMat;var _0x2c6fbf=mesh[_0x354d09(0x1de)](_0x354d09(0x1c9));_0x2c6fbf[_0x354d09(0x1f6)]=glowWhiteMat;var _0x5b863f=mesh[_0x354d09(0x1de)](_0x354d09(0x1ef));_0x5b863f[_0x354d09(0x1f6)]=glowPurpleMat;var _0x5360bf=mesh[_0x354d09(0x1de)](_0x354d09(0x1fa));_0x5360bf[_0x354d09(0x1f6)]=glowGoldMat,mixer=new _0x5fdc25[(_0x354d09(0x1d5))](mesh),clip1=mixer[_0x354d09(0x1c6)](_0x15dd19[_0x354d09(0x1ea)][0x0]),clip1[_0x354d09(0x20e)](),clip1[_0x354d09(0x1e1)]=2.5,_0x42e2f6[_0x354d09(0x211)](mixer),scene[_0x354d09(0x1e0)](mesh);});var _0x4f8326=new _0x5fdc25[(_0x47ace5(0x1ba))]();_0x4f8326['load']('./Kamikaze_Regular.json',function(_0x1455e6){var _0x2e1333=_0x47ace5;if(deviceType==='PC')var _0x44c183=new _0x5fdc25[(_0x2e1333(0x1d8))](_0x2e1333(0x1b7),{'font':_0x1455e6,'size':8.5,'height':0.1,'curveSegments':0x28,'bevelEnabled':!![],'bevelThickness':0x4,'bevelSize':0.18,'bevelSegments':0xf});else var _0x44c183=new _0x5fdc25[(_0x2e1333(0x1d8))](_0x2e1333(0x1b7),{'font':_0x1455e6,'size':3.5,'height':0.1,'curveSegments':0x28,'bevelEnabled':!![],'bevelThickness':0x4,'bevelSize':0.18,'bevelSegments':0xf});_0x44c183['center']();let _0xef1feb=new _0x5fdc25['Mesh'](_0x44c183,glowMysticMat);_0xef1feb['position'][_0x2e1333(0x1ad)](0x0,-0xc,0x5),scene[_0x2e1333(0x1e0)](_0xef1feb),texts[_0x2e1333(0x211)](_0xef1feb);}),controls=new OrbitControls(camera,renderer[_0x47ace5(0x1f8)]),controls[_0x47ace5(0x1d1)]=Math['PI']*0.495,controls['target']['set'](0x0,0xa,0x0),controls['minDistance']=0x28,controls['maxDistance']=0xc8,controls['autoRotate']=!![],controls[_0x47ace5(0x1c7)]=0.5,controls[_0x47ace5(0x216)](),stats=new _0x4b8d80(),window['addEventListener'](_0x47ace5(0x1b8),onWindowResize);}function onWindowResize(){var _0x430115=_0x17e615;camera['aspect']=window[_0x430115(0x1f7)]/window[_0x430115(0x1dc)],camera[_0x430115(0x203)](),renderer[_0x430115(0x1c3)](window[_0x430115(0x1f7)],window['innerHeight']);}function animate(){var _0x2fc177=_0x17e615;controls[_0x2fc177(0x216)]();if(mixer)mixer[_0x2fc177(0x216)](clock[_0x2fc177(0x1be)]());requestAnimationFrame(animate),stats[_0x2fc177(0x216)]();let _0x2f54c2=clock[_0x2fc177(0x1be)]();render();}function render(){var _0x48427d=_0x17e615;const _0x2d5d83=performance[_0x48427d(0x1f4)]()*0.0008;mesh[_0x48427d(0x1f9)]['y']=Math[_0x48427d(0x1e4)](_0x2d5d83)*0x5+20.95;for(let _0x18a6de=0x0;_0x18a6de<texts['length'];_0x18a6de++){texts[_0x18a6de][_0x48427d(0x202)]['y']=-0.04*_0x2d5d83;}water[_0x48427d(0x1f6)][_0x48427d(0x1cd)][_0x48427d(0x1b4)]['value']+=0x1/0x3c,renderer[_0x48427d(0x1bc)](scene,camera);}
+
+		</script>
+
+
+
+<!-- partial -->
+<!-- Preloader -->
+<!-- jQuery Plugin -->
+
+
+
+
+
+
+<!-- jQuery Plugin -->
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.12.3.min.js"></script>
+
+<!-- Preloader -->
+<script type="text/javascript">
+    //<![CDATA[
+        $(window).on('load', function() { // makes sure the whole site is loaded 
+            $('#status').fadeOut(); // will first fade out the loading animation 
+            $('#preloader').delay(350).fadeOut('slow'); // will fade out the white DIV that covers the website. 
+            $('body').delay(350).css({'overflow':'visible'});
+          })
+    //]]>
+</script>
+	</body>
+</html>
